@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "taskmaster": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@kazuph/mcp-taskmanager"
+      ],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "./src",
+        "./docs",
+        "./prompts"
+      ]
+    }
+  }
+} 

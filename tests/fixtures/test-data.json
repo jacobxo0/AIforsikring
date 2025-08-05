@@ -1,0 +1,293 @@
+{
+  "users": {
+    "testUser": {
+      "email": "test-user@example.com",
+      "password": "TestPassword123!",
+      "name": "Test Bruger",
+      "role": "user"
+    },
+    "premiumUser": {
+      "email": "test-premium@example.com",
+      "password": "TestPassword123!",
+      "name": "Premium Bruger",
+      "role": "premium"
+    },
+    "adminUser": {
+      "email": "test-admin@example.com",
+      "password": "TestPassword123!",
+      "name": "Admin Bruger",
+      "role": "admin"
+    }
+  },
+  "policies": [
+    {
+      "id": "test-policy-1",
+      "name": "Test Bilforsikring",
+      "type": "auto",
+      "premium": 2500,
+      "coverage": "Kasko",
+      "vehicle": {
+        "make": "Toyota",
+        "model": "Corolla",
+        "year": 2020,
+        "licensePlate": "AB12345"
+      },
+      "coverageDetails": {
+        "comprehensive": true,
+        "collision": true,
+        "liability": true,
+        "roadsideAssistance": false
+      }
+    },
+    {
+      "id": "test-policy-2",
+      "name": "Test Husforsikring",
+      "type": "home",
+      "premium": 3500,
+      "coverage": "Fuld dækning",
+      "property": {
+        "address": "Testvej 123, 2000 Frederiksberg",
+        "size": 120,
+        "type": "apartment",
+        "buildYear": 1995
+      },
+      "coverageDetails": {
+        "building": true,
+        "contents": true,
+        "liability": true,
+        "waterDamage": true
+      }
+    },
+    {
+      "id": "test-policy-3",
+      "name": "Test Rejseforsikring",
+      "type": "travel",
+      "premium": 800,
+      "coverage": "Årlig rejseforsikring",
+      "travelDetails": {
+        "coverage": "worldwide",
+        "duration": "annual",
+        "activities": ["leisure", "business"]
+      }
+    }
+  ],
+  "claims": [
+    {
+      "id": "test-claim-1",
+      "policyId": "test-policy-1",
+      "type": "collision",
+      "status": "under_review",
+      "incidentDate": "2024-01-15",
+      "description": "Kollision med andet køretøj på motorvejen",
+      "estimatedAmount": 15000,
+      "documents": [
+        "accident-report.pdf",
+        "damage-photos.zip"
+      ]
+    },
+    {
+      "id": "test-claim-2",
+      "policyId": "test-policy-2",
+      "type": "water_damage",
+      "status": "approved",
+      "incidentDate": "2024-02-01",
+      "description": "Vandskade fra sprængt rør i køkken",
+      "estimatedAmount": 25000,
+      "approvedAmount": 22000,
+      "documents": [
+        "plumber-report.pdf",
+        "damage-assessment.pdf"
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc-1",
+      "name": "Bilforsikring Police",
+      "type": "policy",
+      "category": "auto",
+      "uploadDate": "2024-01-01",
+      "size": 245760,
+      "format": "pdf"
+    },
+    {
+      "id": "doc-2",
+      "name": "Skadeanmeldelse",
+      "type": "claim",
+      "category": "auto",
+      "uploadDate": "2024-01-15",
+      "size": 1048576,
+      "format": "pdf"
+    },
+    {
+      "id": "doc-3",
+      "name": "Skadefotos",
+      "type": "evidence",
+      "category": "auto",
+      "uploadDate": "2024-01-15",
+      "size": 5242880,
+      "format": "zip"
+    }
+  ],
+  "chatMessages": [
+    {
+      "id": "msg-1",
+      "type": "user",
+      "content": "Jeg har brug for hjælp til at vælge bilforsikring",
+      "timestamp": "2024-01-01T10:00:00Z"
+    },
+    {
+      "id": "msg-2",
+      "type": "ai",
+      "content": "Jeg hjælper gerne med at finde den rigtige bilforsikring til dig. Kan du fortælle mig om din bil?",
+      "timestamp": "2024-01-01T10:00:05Z"
+    },
+    {
+      "id": "msg-3",
+      "type": "user",
+      "content": "Jeg kører en Toyota Corolla fra 2020",
+      "timestamp": "2024-01-01T10:01:00Z"
+    },
+    {
+      "id": "msg-4",
+      "type": "ai",
+      "content": "En Toyota Corolla fra 2020 er en populær og pålidelig bil. Baseret på din bil vil jeg anbefale følgende forsikringsmuligheder...",
+      "timestamp": "2024-01-01T10:01:10Z",
+      "recommendations": [
+        {
+          "type": "comprehensive",
+          "premium": 2500,
+          "coverage": "Fuld kasko med selvrisiko 5000 kr"
+        },
+        {
+          "type": "third_party_plus",
+          "premium": 1800,
+          "coverage": "Ansvar plus brand og tyveri"
+        }
+      ]
+    }
+  ],
+  "apiResponses": {
+    "policies": {
+      "success": {
+        "policies": [
+          {
+            "id": "policy-1",
+            "name": "Bilforsikring",
+            "type": "auto",
+            "status": "active",
+            "premium": 2500
+          }
+        ]
+      },
+      "error": {
+        "error": "Failed to fetch policies",
+        "code": "FETCH_ERROR"
+      }
+    },
+    "claims": {
+      "success": {
+        "claims": [
+          {
+            "id": "claim-1",
+            "status": "under_review",
+            "type": "collision",
+            "amount": 15000
+          }
+        ]
+      },
+      "error": {
+        "error": "Failed to fetch claims",
+        "code": "FETCH_ERROR"
+      }
+    },
+    "chat": {
+      "success": {
+        "response": "Jeg forstår dit spørgsmål og vil gerne hjælpe dig.",
+        "suggestions": [
+          "Fortæl mig mere om din situation",
+          "Vil du have et tilbud?",
+          "Har du andre spørgsmål?"
+        ]
+      },
+      "error": {
+        "error": "AI service temporarily unavailable",
+        "code": "AI_SERVICE_ERROR"
+      }
+    }
+  },
+  "errorScenarios": [
+    {
+      "name": "network_failure",
+      "description": "Simulate complete network failure",
+      "type": "network",
+      "config": {
+        "offline": true
+      }
+    },
+    {
+      "name": "slow_network",
+      "description": "Simulate slow network connection",
+      "type": "network",
+      "config": {
+        "downloadThroughput": 50000,
+        "uploadThroughput": 20000,
+        "latency": 2000
+      }
+    },
+    {
+      "name": "api_timeout",
+      "description": "API request timeout",
+      "type": "api",
+      "config": {
+        "delay": 10000,
+        "status": 408
+      }
+    },
+    {
+      "name": "server_error",
+      "description": "Internal server error",
+      "type": "api",
+      "config": {
+        "status": 500,
+        "error": "Internal server error"
+      }
+    },
+    {
+      "name": "auth_error",
+      "description": "Authentication failure",
+      "type": "api",
+      "config": {
+        "status": 401,
+        "error": "Unauthorized"
+      }
+    }
+  ],
+  "performanceThresholds": {
+    "pageLoad": {
+      "good": 2500,
+      "needsImprovement": 4000,
+      "poor": 4000
+    },
+    "lcp": {
+      "good": 2500,
+      "needsImprovement": 4000,
+      "poor": 4000
+    },
+    "fid": {
+      "good": 100,
+      "needsImprovement": 300,
+      "poor": 300
+    },
+    "cls": {
+      "good": 0.1,
+      "needsImprovement": 0.25,
+      "poor": 0.25
+    },
+    "apiResponse": {
+      "good": 1000,
+      "needsImprovement": 3000,
+      "poor": 3000
+    }
+  }
+} 

@@ -1,0 +1,27 @@
+ENVIRONMENT VARIABLES GUIDE
+=========================
+
+Opret en fil kaldet .env.local i rod-mappen med dette indhold:
+
+# OpenAI Configuration
+OPENAI_API_KEY=sk-your-openai-key-here
+
+# Database (Supabase)  
+DATABASE_URL=postgresql://username:password@host:port/database
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-supabase-anon-key
+
+# Next.js
+NEXTAUTH_SECRET=your-random-secret-string
+NEXTAUTH_URL=http://localhost:3000
+
+QUICK LINKS:
+- OpenAI keys: https://platform.openai.com/api-keys
+- Supabase: https://supabase.com/dashboard  
+- Vercel deploy: https://vercel.com
+
+NEXT STEPS:
+1. Få API keys fra links ovenfor
+2. Udfyld .env.local filen
+3. Test lokalt: npm run dev
+4. Deploy på Vercel
