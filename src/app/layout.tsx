@@ -43,7 +43,7 @@ export default function RootLayout({
                 <div className="flex items-center justify-between h-16">
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center space-x-2">
-                      <div className="w-8 h-8 bg-insurance-blue rounded-lg flex items-center justify-center">
+                      <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                         <span className="text-white font-bold text-sm">AI</span>
                       </div>
                       <h1 className="text-xl font-bold text-gray-900">

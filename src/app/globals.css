@@ -10,6 +10,29 @@
   body {
     @apply bg-gray-50 text-gray-900;
   }
+  
+  /* Custom Insurance Theme Colors */
+  :root {
+    --insurance-blue: #2563eb;
+    --insurance-blue-dark: #1d4ed8;
+    --insurance-blue-light: #dbeafe;
+  }
+}
+
+@layer utilities {
+  .bg-insurance-blue { background-color: var(--insurance-blue); }
+  .bg-insurance-dark { background-color: var(--insurance-blue-dark); }
+  .bg-insurance-light { background-color: var(--insurance-blue-light); }
+  .text-insurance-blue { color: var(--insurance-blue); }
+  .text-insurance-dark { color: var(--insurance-blue-dark); }
+  .border-insurance-blue { border-color: var(--insurance-blue); }
+  .hover\\:bg-insurance-dark:hover { background-color: var(--insurance-blue-dark); }
+  .hover\\:bg-insurance-light:hover { background-color: var(--insurance-blue-light); }
+  .hover\\:text-insurance-blue:hover { color: var(--insurance-blue); }
+  .hover\\:text-insurance-dark:hover { color: var(--insurance-blue-dark); }
+  .hover\\:border-insurance-blue:hover { border-color: var(--insurance-blue); }
+  .focus\\:ring-insurance-blue:focus { --tw-ring-color: var(--insurance-blue); }
+  .focus\\:border-insurance-blue:focus { border-color: var(--insurance-blue); }
 }
 
 @layer components {
