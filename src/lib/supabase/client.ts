@@ -1,9 +1,9 @@
 import { createBrowserClient, createServerClient as createSSRServerClient } from '@supabase/ssr'
 import type { Database } from './types'
 
-// Get Supabase URL and anon key
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+// Get Supabase URL and anon key (optional - system works without database)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
 // Client-side Supabase client
 export const createClient = () => createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)

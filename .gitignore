@@ -123,3 +123,4 @@ test-results.xml
 
 # Cache files
 .cache/
+.vercel

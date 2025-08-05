@@ -1,8 +1,7 @@
 {
   "version": 2,
-  "name": "ai-forsikringsguiden",
   "alias": ["ai-forsikringsguiden.vercel.app"],
-  "regions": ["cph1", "fra1"],
+  "regions": ["fra1"],
   "build": {
     "env": {
       "NODE_ENV": "production"
@@ -12,11 +11,7 @@
     "NODE_ENV": "production",
     "NEXT_PUBLIC_APP_ENV": "production"
   },
-  "functions": {
-    "src/app/api/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
+
   "headers": [
     {
       "source": "/(.*)",
@@ -107,10 +102,6 @@
     "autoAlias": true
   },
   "crons": [
-    {
-      "path": "/api/health-check",
-      "schedule": "*/5 * * * *"
-    },
     {
       "path": "/api/cleanup",
       "schedule": "0 2 * * *"
