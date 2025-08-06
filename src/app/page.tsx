@@ -1,8 +1,6 @@
-import Link from 'next/link'
-
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="max-w-4xl mx-auto px-4 py-12">
         
         {/* Header */}
@@ -28,7 +26,7 @@ export default function Home() {
 
           {/* Feature Cards */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <Link href="/chat" className="group">
+            <a href="/chat" className="group">
               <div className="bg-blue-50 rounded-lg p-6 hover:bg-blue-100 transition-colors">
                 <div className="text-3xl mb-3">💬</div>
                 <h3 className="font-semibold text-gray-900 mb-2">AI Chat</h3>
@@ -36,19 +34,19 @@ export default function Home() {
                   Stil spørgsmål til vores forsikringsekspert AI
                 </p>
               </div>
-            </Link>
+            </a>
 
-            <Link href="/dashboard" className="group">
+            <a href="/dashboard" className="group">
               <div className="bg-green-50 rounded-lg p-6 hover:bg-green-100 transition-colors">
                 <div className="text-3xl mb-3">📊</div>
                 <h3 className="font-semibold text-gray-900 mb-2">Dashboard</h3>
                 <p className="text-sm text-gray-600">
-                  Oversigt over dine forsikringer og anbefaling
+                  Oversigt over dine forsikringer og anbefalinger
                 </p>
               </div>
-            </Link>
+            </a>
 
-            <Link href="/policies" className="group">
+            <a href="/policies" className="group">
               <div className="bg-purple-50 rounded-lg p-6 hover:bg-purple-100 transition-colors">
                 <div className="text-3xl mb-3">📄</div>
                 <h3 className="font-semibold text-gray-900 mb-2">Policer</h3>
@@ -56,9 +54,9 @@ export default function Home() {
                   Administrer og analyser dine forsikringer
                 </p>
               </div>
-            </Link>
+            </a>
 
-            <Link href="/documents" className="group">
+            <a href="/documents" className="group">
               <div className="bg-orange-50 rounded-lg p-6 hover:bg-orange-100 transition-colors">
                 <div className="text-3xl mb-3">📁</div>
                 <h3 className="font-semibold text-gray-900 mb-2">Dokumenter</h3>
@@ -66,17 +64,17 @@ export default function Home() {
                   Upload og analyser forsikringsdokumenter
                 </p>
               </div>
-            </Link>
+            </a>
           </div>
 
           {/* CTA Button */}
           <div className="text-center">
-            <Link 
+            <a 
               href="/chat" 
               className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
               🚀 Start AI Rådgivning Nu
-            </Link>
+            </a>
           </div>
         </div>
 
