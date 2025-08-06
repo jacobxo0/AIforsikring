@@ -9,7 +9,12 @@
       "Bash(npm run test:e2e:*)",
       "Bash(timeout 15 npm run dev)",
       "Bash(npm run dev:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(npm run start:*)",
+      "Bash(rm:*)",
+      "Bash(npm ls:*)"
     ],
     "deny": []
   }

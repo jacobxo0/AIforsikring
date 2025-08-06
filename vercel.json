@@ -1,110 +1,11 @@
 {
   "version": 2,
-  "alias": ["ai-forsikringsguiden.vercel.app"],
   "regions": ["fra1"],
   "build": {
     "env": {
       "NODE_ENV": "production"
     }
   },
-  "env": {
-    "NODE_ENV": "production",
-    "NEXT_PUBLIC_APP_ENV": "production"
-  },
-
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
-          "key": "Referrer-Policy",
-          "value": "strict-origin-when-cross-origin"
-        },
-        {
-          "key": "Permissions-Policy",
-          "value": "camera=(), microphone=(), geolocation=()"
-        }
-      ]
-    },
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "https://ai-forsikringsguiden.vercel.app"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET, POST, PUT, DELETE, OPTIONS"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Content-Type, Authorization"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "no-cache, no-store, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/static/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/home",
-      "destination": "/",
-      "permanent": true
-    },
-    {
-      "source": "/docs",
-      "destination": "/help",
-      "permanent": false
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/health",
-      "destination": "/api/health"
-    },
-    {
-      "source": "/api/status",
-      "destination": "/api/status"
-    },
-    {
-      "source": "/sitemap.xml",
-      "destination": "/api/sitemap"
-    }
-  ],
   "trailingSlash": false,
-  "cleanUrls": true,
-  "github": {
-    "enabled": true,
-    "autoAlias": true
-  },
-  "crons": [
-    {
-      "path": "/api/cleanup",
-      "schedule": "0 2 * * *"
-    }
-  ]
-} 
+  "cleanUrls": true
+}
