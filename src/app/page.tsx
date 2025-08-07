@@ -1,5 +1,15 @@
 export default function Home() {
   return (
+    <div>
+      <h1>AI Forsikringsguiden Works!</h1>
+      <p>Dette er en simpel test side.</p>
+      <p>Hvis du kan se denne besked, virker deployment!</p>
+    </div>
+  )
+}
+
+function OldHome() {
+  return (
     <div className="bg-white">
       {/* Hero Section */}
       <div className="relative isolate px-6 pt-14 lg:px-8">

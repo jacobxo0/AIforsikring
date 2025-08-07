@@ -32,7 +32,8 @@
       "Bash(curl:*)",
       "WebFetch(domain:a-iforsikring.vercel.app)",
       "Bash(mkdir:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "WebFetch(domain:a-iforsikring-git-master-jacob-kristensens-projects.vercel.app)"
     ],
     "deny": []
   },
