@@ -1,5 +1,4 @@
 {
-  "model": "claude-4-opus-20250514",
   "permissions": {
     "allow": [
       "Bash(npm run lint)",
@@ -30,8 +29,10 @@
       "Bash(timeout 8 npm run dev)",
       "Bash(npm update)",
       "WebFetch(domain:a-iforsikring-luk7ogfv5-jacob-kristensens-projects.vercel.app)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "WebFetch(domain:a-iforsikring.vercel.app)"
     ],
     "deny": []
-  }
+  },
+  "model": "claude-4-opus-20250514"
 }
