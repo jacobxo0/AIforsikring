@@ -30,7 +30,9 @@
       "Bash(npm update)",
       "WebFetch(domain:a-iforsikring-luk7ogfv5-jacob-kristensens-projects.vercel.app)",
       "Bash(curl:*)",
-      "WebFetch(domain:a-iforsikring.vercel.app)"
+      "WebFetch(domain:a-iforsikring.vercel.app)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   },
