@@ -12,6 +12,7 @@ const ChatInterface = () => {
   ])
   const [inputText, setInputText] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const sendMessage = async () => {
     if (!inputText.trim()) return
@@ -25,23 +26,47 @@ const ChatInterface = () => {
     setMessages(prev => [...prev, userMessage])
     setInputText('')
     setIsLoading(true)
+    setError(null)
 
-    // Simulate AI response for now
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: userMessage.text, history: messages })
+      })
+
+      if (!response.ok) {
+        const problem = await response.json().catch(() => ({}))
+        throw new Error(problem?.error || `Serverfejl (${response.status})`)
+      }
+
+      const data: { reply?: string } = await response.json()
       const aiMessage = {
         id: Date.now() + 1,
-        text: "Tak for dit spørgsmål! Dette er en test-respons. AI integration kommer snart.",
+        text: (data.reply || 'Der opstod en fejl. Prøv igen.') as string,
         sender: 'ai' as const
       }
       setMessages(prev => [...prev, aiMessage])
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Ukendt fejl'
+      setError(message)
+      const aiMessage = {
+        id: Date.now() + 1,
+        text: `⚠️ ${message}. Viser midlertidigt standardsvar.`,
+        sender: 'ai' as const
+      }
+      setMessages(prev => [...prev, aiMessage])
+    } finally {
       setIsLoading(false)
-    }, 1500)
+    }
   }
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">AI Forsikringsrådgiver</h2>
-      
+      {error && (
+        <div className="mb-3 text-sm text-red-600">{error}</div>
+      )}
       {/* Chat Messages */}
       <div className="h-96 overflow-y-auto border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50">
         {messages.map((message) => (
@@ -81,7 +106,7 @@ const ChatInterface = () => {
           type="text"
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+          onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
           placeholder="Stil et spørgsmål om forsikring..."
           className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
           disabled={isLoading}

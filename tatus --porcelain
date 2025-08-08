@@ -1,0 +1,3 @@
+[33mdf3c4e9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m 🎨 Create professional AI Insurance Guide homepage
+[33mf8f6e70[m 🔧 Add vercel-build script to force Next.js framework detection
+[33m79e5898[m 🔄 Switch to Pages Router - complete rebuild for Vercel compatibility
