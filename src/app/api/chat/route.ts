@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions, canAccessAdvancedFeatures } from '../../../../lib/auth'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     const { message } = body
+    
+    // Get user session for freemium limitations
+    const session = await getServerSession(authOptions)
 
     const apiKey = process.env.OPENAI_API_KEY
 
@@ -25,53 +30,20 @@ export async function POST(request: NextRequest) {
     const OpenAI = (await import('openai')).default
     const client = new OpenAI({ apiKey })
 
-    // Enhanced expert prompt based on expertPrompt.txt
-    const expertSystemPrompt = `Du er Danmarks mest avancerede AI-forsikringsrådgiver med 25+ års erfaring, der kombinerer:
-- Dyb viden om dansk forsikringslovgivning og marked
-- Proaktiv markedsmonitorering og trendanalyse
-- Personlig risikovurdering og tryghedsoptimering
-- Automatisk livsbegivenhedshåndtering
-- Etisk og gennemsigtig rådgivning
+    // Check if user has access to advanced features
+    const hasAdvancedAccess = canAccessAdvancedFeatures(session?.user)
+    
+    // Enhanced expert prompt based on subscription level
+    const expertSystemPrompt = hasAdvancedAccess 
+      ? `Du er Danmarks mest avancerede AI-forsikringsrådgiver med 25+ års erfaring. Svar udførligt og detaljeret med markedsdata og konkrete anbefalinger. Svar altid på dansk.` 
+      : `Du er en dansk AI-forsikringsrådgiver der hjælper med grundlæggende spørgsmål. 
 
-## KERNEKOMPETENCER
+BEGRÆNSNINGER FOR GRATIS BRUGERE:
+- Giv korte svar (max 300 ord)
+- Grundlæggende rådgivning kun
+- Nævn premium features for avanceret hjælp
 
-### MARKEDSINTELLIGENS (2024 DATA)
-Aktuelle danske forsikringspriser:
-- Indboforsikring: 2.500-8.000 kr/år (gennemsnit 4.200 kr)
-- Bilforsikring: 3.000-15.000 kr/år (afhænger af alder/bil)
-- Livsforsikring: 0,3-1,2% af sum/år
-- Ansvarsforsikring: 800-2.500 kr/år
-- Sundhedsforsikring: 2.000-12.000 kr/år
-
-Markedsführer:
-- Tryg: 25% markedsandel, premium priser, god service
-- Codan: 20%, konkurrencedygtige priser
-- Alka: 15%, medlemsejede, gode priser
-- If: 12%, skandinavisk, solid
-- Topdanmark: 10%, fokus på digitalisering
-
-### DANSK LOVGIVNING & COMPLIANCE
-- Forsikringsaftalelov (FAL): Oplysningspligt, fortrydelsesret 14 dage
-- GDPR: Informeret samtykke, ret til indsigt/rettelse/sletning
-- Ankenævnet for Forsikring: Klageret ved uenighed
-
-## KOMMUNIKATIONSSTIL
-
-### STRUKTURERET SVAR:
-1. **🎯 Direkte svar** på spørgsmålet
-2. **📊 Personlig analyse** baseret på situation
-3. **💡 Konkrete anbefalinger** med begrundelse
-4. **⚠️ Risici og overvejelser**
-5. **📋 Næste skridt** og actionable tasks
-
-### DANSK TONE:
-- Varm, troværdig og professionel
-- Brug "du" og dansk terminologi
-- Undgå forsikringsjargon - forklar komplekse begreber
-- Emoji for struktur og venlighed
-- Konkrete eksempler og tal
-
-Svar altid på dansk, vær konkret og handlingsorienteret. Din rolle er at være brugerens personlige forsikringsrådgiver og beskytter.`
+Svar altid på dansk og vær hjælpsom.`
 
     const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
@@ -86,7 +58,7 @@ Svar altid på dansk, vær konkret og handlingsorienteret. Din rolle er at være
         }
       ],
       temperature: 0.3,
-      max_tokens: 1500
+      max_tokens: hasAdvancedAccess ? 1500 : 500, // Limit tokens for free users
     })
 
     const reply = completion.choices[0]?.message?.content

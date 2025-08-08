@@ -10,12 +10,19 @@
     "vercel-build": "next build"
   },
   "dependencies": {
+    "@stripe/stripe-js": "^7.8.0",
+    "@vercel/postgres": "^0.10.0",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
     "multer": "^2.0.2",
     "next": "^14.2.31",
+    "next-auth": "^4.24.11",
     "openai": "^5.12.1",
     "pdf-parse": "^1.1.1",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "stripe": "^18.4.0",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/multer": "^2.0.0",
@@ -23,6 +30,7 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.0.4",

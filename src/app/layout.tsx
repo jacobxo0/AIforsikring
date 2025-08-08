@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from 'next/link';
 import "./globals.css";
 import { Inter } from 'next/font/google';
+import Providers from './providers';
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -33,6 +34,7 @@ export default function RootLayout({
   return (
     <html lang="da">
       <body className={`${inter.className} antialiased bg-gray-50 min-h-screen`}>
+        <Providers>
           <div className="min-h-screen flex flex-col">
             {/* Global Header */}
             <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -132,6 +134,7 @@ export default function RootLayout({
               </div>
             </footer>
           </div>
+        </Providers>
       </body>
     </html>
   );
