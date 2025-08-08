@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions, canExportReports } from '../../../../../lib/auth';
@@ -23,7 +25,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user can export reports
     if (!canExportReports(session.user)) {
       return NextResponse.json(
         { 
@@ -31,11 +32,10 @@ export async function POST(request: NextRequest) {
           requiresPayment: true,
           price: 39
         },
-        { status: 402 } // Payment required
+        { status: 402 }
       );
     }
 
-    // Get user's reports
     const userReports = await getUserReports(session.user.id);
     const report = userReports.find(r => r.id === reportId);
 
@@ -46,9 +46,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For premium users or paid reports, allow export
     if (session.user.subscriptionType === 'premium' || report.paid) {
-      // Generate PDF content (simplified for now - in production use proper PDF generation)
       const pdfContent = {
         title: report.title,
         content: report.content,

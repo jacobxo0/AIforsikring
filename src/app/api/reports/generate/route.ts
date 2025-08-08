@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '../../../../../lib/auth';
@@ -31,7 +33,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate comprehensive comparison report using OpenAI
     const OpenAI = (await import('openai')).default;
     const client = new OpenAI({ apiKey });
 
@@ -98,7 +99,6 @@ Lav rapporten professionel, detaljeret og brugbar til beslutningstagning.`;
       );
     }
 
-    // Create report in database
     const report = await createReport(
       session.user.id,
       `Sammenligninsrapport - ${new Date().toLocaleDateString('da-DK')}`,
