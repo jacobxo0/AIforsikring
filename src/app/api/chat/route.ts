@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const client = new OpenAI({ apiKey })
 
     const completion = await client.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',
@@ -61,8 +61,31 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Chat API fejl:', error)
+    
+    // More specific error handling for OpenAI API
+    if (error instanceof Error) {
+      if (error.message.includes('insufficient_quota')) {
+        return NextResponse.json(
+          { error: 'OpenAI API kvote opbrugt. Kontakt administrator.' },
+          { status: 500 }
+        )
+      }
+      if (error.message.includes('invalid_api_key')) {
+        return NextResponse.json(
+          { error: 'Ugyldig OpenAI API nøgle.' },
+          { status: 500 }
+        )
+      }
+      if (error.message.includes('model_not_found')) {
+        return NextResponse.json(
+          { error: 'AI model ikke tilgængelig.' },
+          { status: 500 }
+        )
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Der opstod en intern serverfejl' },
+      { error: `Der opstod en intern serverfejl: ${error instanceof Error ? error.message : 'Ukendt fejl'}` },
       { status: 500 }
     )
   }
