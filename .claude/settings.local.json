@@ -34,7 +34,8 @@
       "Bash(mkdir:*)",
       "Bash(mv:*)",
       "WebFetch(domain:a-iforsikring-git-master-jacob-kristensens-projects.vercel.app)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "WebFetch(domain:a-iforsikring-l0l0d534p-jacob-kristensens-projects.vercel.app)"
     ],
     "deny": []
   },
