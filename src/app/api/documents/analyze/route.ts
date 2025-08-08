@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { readFile } from 'fs/promises'
-import { join } from 'path'
-// Dynamic import will be used for pdf-parse to avoid build-time issues
+// Remove filesystem imports - not compatible with Vercel serverless
+// import { readFile } from 'fs/promises'
+// import { join } from 'path'
 
 export async function POST(request: NextRequest) {
   try {
-    const { documentId, question } = await request.json()
+    const { documentId, question, documentText } = await request.json()
 
     if (!documentId) {
       return NextResponse.json(
@@ -14,42 +14,62 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Find the document file
-    const uploadsDir = join(process.cwd(), 'uploads')
-    const files = await readFile(join(uploadsDir, documentId + '.pdf'))
-    
-    // Extract full text from PDF
-    const pdfParse = (await import('pdf-parse')).default
-    const pdfData = await pdfParse(files)
-    const documentText = pdfData.text
+    // For Vercel compatibility, we expect documentText to be passed from frontend
+    // since we can't store files on filesystem
+    if (!documentText) {
+      return NextResponse.json(
+        { error: 'Dokument tekst ikke tilgængelig. Upload dokumentet igen.' },
+        { status: 400 }
+      )
+    }
 
     const apiKey = process.env.OPENAI_API_KEY
     if (!apiKey) {
       return NextResponse.json(
-        { error: 'OpenAI API ikke konfigureret' },
+        { error: 'OpenAI API ikke konfigureret. Kontakt administrator.' },
         { status: 500 }
       )
     }
 
-    // Use OpenAI to analyze the document
+    // Use OpenAI with enhanced Danish insurance expert prompt
     const OpenAI = (await import('openai')).default
     const client = new OpenAI({ apiKey })
 
-    const systemPrompt = `Du er en dansk forsikringsekspert der analyserer forsikringsdokumenter. 
+    // Enhanced expert prompt based on expertPrompt.txt
+    const systemPrompt = `Du er Danmarks mest avancerede AI-forsikringsrådgiver med 25+ års erfaring, der kombinerer:
+- Dyb viden om dansk forsikringslovgivning og marked
+- Proaktiv markedsmonitorering og trendanalyse  
+- Personlig risikovurdering og tryghedsoptimering
+- Etisk og gennemsigtig rådgivning
 
-Dokument indhold:
+DOKUMENT INDHOLD:
 ${documentText}
 
-Analyser dette dokument og besvar spørgsmål om:
-- Forsikringstype og dækning
-- Præmier og selvrisiko
-- Vilkår og betingelser
-- Sammenligninger med andre forsikringer
-- Forbedringsforslag
+Som ekspert skal du analysere dette dokument og:
 
-Svar altid på dansk og vær præcis og detaljeret.`
+**📊 PERSONLIG ANALYSE:**
+- Identificer forsikringstype og dækningsområder
+- Beregn værdi og risikodækning
+- Sammenlign med markedsstandard (2024 priser)
 
-    const userPrompt = question || 'Analyser dette forsikringsdokument og giv mig en detaljeret oversigt over dækningen, præmier og vigtige vilkår.'
+**💡 KONKRETE ANBEFALINGER:**
+- Optimeringområder for bedre dækning
+- Potentielle besparelser
+- Risici der ikke er dækket
+
+**⚠️ VIGTIGE OVERVEJELSER:**
+- Selvrisiko og begrænsninger
+- Udløb og fornyelse
+- Klageret og erstatningsprocedure
+
+**📋 HANDLINGSPLAN:**
+- Konkrete næste skridt
+- Deadlines og frister
+- Opfølgning
+
+Svar altid på dansk, vær konkret og handlingsorienteret. Brug emoji til struktur og gør svarene lette at scanne.`
+
+    const userPrompt = question || 'Analyser dette forsikringsdokument grundigt og giv mig en komplet oversigt med anbefalinger og handlingsplan.'
 
     const completion = await client.chat.completions.create({
       model: 'gpt-4o-mini',
@@ -65,7 +85,7 @@ Svar altid på dansk og vær præcis og detaljeret.`
 
     if (!analysis) {
       return NextResponse.json(
-        { error: 'Kunne ikke analysere dokumentet' },
+        { error: 'Kunne ikke analysere dokumentet. Prøv igen senere.' },
         { status: 500 }
       )
     }
@@ -74,23 +94,39 @@ Svar altid på dansk og vær præcis og detaljeret.`
       success: true,
       analysis,
       documentInfo: {
-        pages: pdfData.numpages,
-        wordCount: documentText.split(/\s+/).length
+        documentId,
+        wordCount: documentText.split(/\s+/).length,
+        analysisDate: new Date().toISOString()
       }
     })
 
   } catch (error) {
     console.error('Document analysis error:', error)
     
-    if (error instanceof Error && error.message.includes('ENOENT')) {
-      return NextResponse.json(
-        { error: 'Dokumentet blev ikke fundet' },
-        { status: 404 }
-      )
+    // Enhanced error handling
+    if (error instanceof Error) {
+      if (error.message.includes('insufficient_quota')) {
+        return NextResponse.json(
+          { error: 'OpenAI API kvote opbrugt. Kontakt administrator.' },
+          { status: 500 }
+        )
+      }
+      if (error.message.includes('invalid_api_key')) {
+        return NextResponse.json(
+          { error: 'Ugyldig OpenAI API nøgle.' },
+          { status: 500 }
+        )
+      }
+      if (error.message.includes('model_not_found')) {
+        return NextResponse.json(
+          { error: 'AI model ikke tilgængelig.' },
+          { status: 500 }
+        )
+      }
     }
     
     return NextResponse.json(
-      { error: 'Fejl ved analyse af dokument' },
+      { error: `Fejl ved analyse af dokument: ${error instanceof Error ? error.message : 'Ukendt fejl'}` },
       { status: 500 }
     )
   }

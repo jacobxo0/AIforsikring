@@ -12,6 +12,7 @@ interface Document {
     documentType: string
     hasInsuranceKeywords: boolean
     extractedText: string
+    fullText?: string // Added for Vercel compatibility
   }
 }
 
@@ -22,8 +23,9 @@ interface ChatMessage {
 }
 
 export default function DocumentsPage() {
-  const [documents, setDocuments] = useState<Document[]>([])
-  const [selectedDocument, setSelectedDocument] = useState<Document | null>(null)
+  // Store documents with full text in state for Vercel compatibility
+  const [documents, setDocuments] = useState<(Document & { fullText?: string })[]>([])
+  const [selectedDocument, setSelectedDocument] = useState<(Document & { fullText?: string }) | null>(null)
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
@@ -56,12 +58,17 @@ export default function DocumentsPage() {
       }
 
       if (result.success) {
-        setDocuments(prev => [...prev, result.document])
-        setSelectedDocument(result.document)
+        // Store the full document including fullText for analysis
+        const documentWithFullText = {
+          ...result.document,
+          fullText: result.document.analysis.fullText
+        }
+        setDocuments(prev => [...prev, documentWithFullText])
+        setSelectedDocument(documentWithFullText)
         // Reset chat when new document is selected
         setChatMessages([{
           id: 1,
-          text: `Dokument "${result.document.filename}" er uploadet og klar til analyse. Stil mig et spørgsmål om dokumentet!`,
+          text: `Dokument "${result.document.filename}" er uploadet og klar til analyse. Dette er et ${result.document.analysis.documentType} dokument med ${result.document.analysis.pages} sider. Stil mig et spørgsmål om dokumentet!`,
           sender: 'ai'
         }])
       }
@@ -86,7 +93,8 @@ export default function DocumentsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           documentId: selectedDocument.id,
-          question
+          question,
+          documentText: selectedDocument.fullText || selectedDocument.analysis.fullText // Pass full text for Vercel
         })
       })
 
@@ -140,11 +148,11 @@ export default function DocumentsPage() {
     }
   }
 
-  const selectDocument = (doc: Document) => {
+  const selectDocument = (doc: Document & { fullText?: string }) => {
     setSelectedDocument(doc)
     setChatMessages([{
       id: 1,
-      text: `Du har valgt "${doc.filename}". Dette er et ${doc.analysis.documentType} dokument. Stil mig spørgsmål om indholdet!`,
+      text: `Du har valgt "${doc.filename}". Dette er et ${doc.analysis.documentType} dokument med ${doc.analysis.pages} sider og ${doc.analysis.wordCount} ord. Stil mig spørgsmål om indholdet!`,
       sender: 'ai'
     }])
   }

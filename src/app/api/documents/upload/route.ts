@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { writeFile, mkdir } from 'fs/promises'
-import { join } from 'path'
-import { existsSync } from 'fs'
+// Remove filesystem imports - not needed for Vercel serverless
+// import { writeFile, mkdir } from 'fs/promises'
+// import { join } from 'path'
+// import { existsSync } from 'fs'
 // Dynamic import will be used for pdf-parse to avoid build-time issues
 
 export async function POST(request: NextRequest) {
@@ -32,51 +33,45 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'uploads')
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true })
-    }
-
-    // Generate unique filename
-    const filename = `${Date.now()}-${file.name}`
-    const filepath = join(uploadsDir, filename)
-
-    // Save file
+    // Process file in memory (Vercel-compatible)
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    await writeFile(filepath, buffer)
 
     // Extract text from PDF
     let extractedText = ''
+    let pdfPages = 1
     try {
       const pdfParse = (await import('pdf-parse')).default
       const pdfData = await pdfParse(buffer)
       extractedText = pdfData.text
+      pdfPages = pdfData.numpages || 1
     } catch (pdfError) {
       console.error('PDF parsing error:', pdfError)
       return NextResponse.json(
-        { error: 'Kunne ikke læse PDF indhold' },
+        { error: 'Kunne ikke læse PDF indhold. Kontroller at filen er en gyldig PDF.' },
         { status: 500 }
       )
     }
 
-    // Basic analysis of the document
+    // Enhanced analysis of the document
     const analysis = {
-      filename,
+      filename: file.name,
       filesize: file.size,
-      pages: extractedText.split('\f').length,
-      wordCount: extractedText.split(/\s+/).length,
-      hasInsuranceKeywords: /forsikring|police|dækning|selvrisiko|præmie/i.test(extractedText),
+      pages: pdfPages,
+      wordCount: extractedText.split(/\s+/).filter(word => word.length > 0).length,
+      hasInsuranceKeywords: /forsikring|police|dækning|selvrisiko|præmie|erstatning|skade|forsikret/i.test(extractedText),
       documentType: detectDocumentType(extractedText),
-      extractedText: extractedText.substring(0, 1000) // First 1000 chars for preview
+      extractedText: extractedText.substring(0, 2000), // Preview text
+      fullText: extractedText, // Store full text for analysis
+      uploadDate: new Date().toISOString(),
+      documentId: `doc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     }
 
     return NextResponse.json({
       success: true,
       document: {
-        id: filename.split('.')[0],
-        filename,
+        id: analysis.documentId,
+        filename: file.name,
         analysis
       }
     })
@@ -84,7 +79,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json(
-      { error: 'Der opstod en fejl ved upload' },
+      { error: `Der opstod en fejl ved upload: ${error instanceof Error ? error.message : 'Ukendt fejl'}` },
       { status: 500 }
     )
   }
@@ -93,23 +88,30 @@ export async function POST(request: NextRequest) {
 function detectDocumentType(text: string): string {
   const lowercaseText = text.toLowerCase()
   
-  if (lowercaseText.includes('bilforsikring') || lowercaseText.includes('motorforsikring')) {
+  // Enhanced detection with more keywords
+  if (lowercaseText.includes('bilforsikring') || lowercaseText.includes('motorforsikring') || lowercaseText.includes('køretøj')) {
     return 'Bilforsikring'
   }
-  if (lowercaseText.includes('husejerforsikring') || lowercaseText.includes('bygningsforsikring')) {
+  if (lowercaseText.includes('husejerforsikring') || lowercaseText.includes('bygningsforsikring') || lowercaseText.includes('ejerbolig')) {
     return 'Husejerforsikring'
   }
-  if (lowercaseText.includes('indboforsikring') || lowercaseText.includes('indbo')) {
+  if (lowercaseText.includes('indboforsikring') || lowercaseText.includes('indbo') || lowercaseText.includes('løsøre')) {
     return 'Indboforsikring'
   }
-  if (lowercaseText.includes('rejseforsikring')) {
+  if (lowercaseText.includes('rejseforsikring') || lowercaseText.includes('ferie') || lowercaseText.includes('udlandsrejse')) {
     return 'Rejseforsikring'
   }
-  if (lowercaseText.includes('ulykkesforsikring')) {
+  if (lowercaseText.includes('ulykkesforsikring') || lowercaseText.includes('personskade')) {
     return 'Ulykkesforsikring'
   }
-  if (lowercaseText.includes('livsforsikring')) {
+  if (lowercaseText.includes('livsforsikring') || lowercaseText.includes('dødsfaldssum')) {
     return 'Livsforsikring'
+  }
+  if (lowercaseText.includes('ansvarsforsikring') || lowercaseText.includes('erstatningsansvar')) {
+    return 'Ansvarsforsikring'
+  }
+  if (lowercaseText.includes('sundhedsforsikring') || lowercaseText.includes('sygesikring')) {
+    return 'Sundhedsforsikring'
   }
   if (lowercaseText.includes('police') || lowercaseText.includes('forsikring')) {
     return 'Forsikringspolice'
