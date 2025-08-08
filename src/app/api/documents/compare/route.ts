@@ -1,13 +1,12 @@
+export const dynamic = 'force-dynamic'
+
 import { NextRequest, NextResponse } from 'next/server'
-import { readFile, readdir } from 'fs/promises'
-import { join } from 'path'
-// Dynamic import will be used for pdf-parse to avoid build-time issues
 
 export async function POST(request: NextRequest) {
   try {
-    const { documentIds } = await request.json()
+    const { documentIds, documentsPayload } = await request.json()
 
-    if (!documentIds || documentIds.length < 2) {
+    if ((!documentIds || documentIds.length < 2) && (!documentsPayload || documentsPayload.length < 2)) {
       return NextResponse.json(
         { error: 'Mindst 2 dokumenter påkrævet for sammenligning' },
         { status: 400 }
@@ -22,34 +21,20 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Extract text from all documents
-    const uploadsDir = join(process.cwd(), 'uploads')
-    const documents = []
+    // Prefer payload from client (fullText) to avoid filesystem usage in serverless
+    const docs = (documentsPayload && Array.isArray(documentsPayload) && documentsPayload.length >= 2)
+      ? documentsPayload.map((d: any) => ({ id: d.id, text: String(d.fullText || d.text || '') }))
+      : []
 
-    for (const docId of documentIds) {
-      try {
-        const filePath = join(uploadsDir, docId + '.pdf')
-        const buffer = await readFile(filePath)
-        const pdfParse = (await import('pdf-parse')).default
-        const pdfData = await pdfParse(buffer)
-        
-        documents.push({
-          id: docId,
-          text: pdfData.text,
-          pages: pdfData.numpages
-        })
-      } catch (error) {
-        console.error(`Error reading document ${docId}:`, error)
-        return NextResponse.json(
-          { error: `Kunne ikke læse dokument ${docId}` },
-          { status: 404 }
-        )
-      }
+    if (docs.length < 2) {
+      return NextResponse.json(
+        { error: 'Dokument tekst mangler. Åbn dokumenterne via /documents og prøv igen.' },
+        { status: 400 }
+      )
     }
 
-    // Create comparison prompt
-    const documentTexts = documents.map((doc, index) => 
-      `DOKUMENT ${index + 1} (ID: ${doc.id}):\n${doc.text}\n\n`
+    const documentTexts = docs.map((doc, index) => 
+      `DOKUMENT ${index + 1} (ID: ${doc.id}):\n${doc.text.substring(0, 8000)}\n\n`
     ).join('')
 
     const systemPrompt = `Du er en dansk forsikringsekspert der sammenligner forsikringspolicer.
@@ -109,11 +94,8 @@ Vær konkret, objektiv og brug danske termer. Fokuser på praktiske forskelle de
     return NextResponse.json({
       success: true,
       comparison,
-      documentsCompared: documents.length,
-      documentInfo: documents.map(doc => ({
-        id: doc.id,
-        pages: doc.pages
-      }))
+      documentsCompared: docs.length,
+      documentInfo: docs.map((doc) => ({ id: doc.id }))
     })
 
   } catch (error) {
@@ -125,29 +107,7 @@ Vær konkret, objektiv og brug danske termer. Fokuser på praktiske forskelle de
   }
 }
 
-// GET endpoint to list available documents for comparison
 export async function GET() {
-  try {
-    const uploadsDir = join(process.cwd(), 'uploads')
-    const files = await readdir(uploadsDir)
-    
-    const pdfFiles = files
-      .filter(file => file.endsWith('.pdf'))
-      .map(file => ({
-        id: file.replace('.pdf', ''),
-        filename: file
-      }))
-
-    return NextResponse.json({
-      success: true,
-      documents: pdfFiles
-    })
-
-  } catch (error) {
-    console.error('List documents error:', error)
-    return NextResponse.json(
-      { error: 'Kunne ikke hente dokumentliste' },
-      { status: 500 }
-    )
-  }
+  // In serverless, we cannot read local uploads; instruct client to use Documents page state
+  return NextResponse.json({ success: true, documents: [] })
 }
